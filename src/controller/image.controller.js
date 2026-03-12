@@ -3,6 +3,9 @@ const Image = require("../model/image.model");
 exports.uploadImage = async (req, res) => {
   try {
 
+    console.log("FILE RECEIVED:", req.file);
+    console.log("BODY RECEIVED:", req.body);
+
     if (!req.file) {
       return res.status(400).json({
         message: "No file uploaded"
