@@ -13,4 +13,6 @@ router.get("/:id", imageController.getImageById)
 
 router.delete("/:id", imageController.deleteImage)
 
+router.put("/update/:id", upload.single("image"), imageController.updateImage)
+
 module.exports = router
