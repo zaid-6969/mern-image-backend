@@ -2,16 +2,26 @@ const Image = require("../model/image.model");
 
 exports.uploadImage = async (req, res) => {
   try {
+
+    // check if file exists
+    if (!req.file) {
+      return res.status(400).json({
+        message: "No file uploaded"
+      });
+    }
+
     const image = await Image.create({
       image: req.file.path,
-      caption: req.body.caption,
+      caption: req.body.caption
     });
 
     res.json({
       message: "Image uploaded",
-      data: image,
+      data: image
     });
+
   } catch (error) {
+    console.error("UPLOAD ERROR:", error);
     res.status(500).json({ error: error.message });
   }
 };
