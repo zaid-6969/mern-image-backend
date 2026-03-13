@@ -9,10 +9,8 @@ exports.uploadImage = async (req, res) => {
       });
     }
 
-    // upload to ImageKit
     const result = await uploadFile(req.file.buffer);
 
-    // save image URL to database
     const image = await Image.create({
       image: result.url,
       caption: req.body.caption,
@@ -51,41 +49,32 @@ exports.deleteImage = async (req, res) => {
 };
 
 exports.updateImage = async (req, res) => {
-
   try {
-
-    const id = req.params.id
+    const id = req.params.id;
 
     let updateData = {
-      caption: req.body.caption
-    }
+      caption: req.body.caption,
+    };
 
     if (req.file) {
+      const uploadFile = require("../services/storage.service");
 
-      const uploadFile = require("../services/storage.service")
+      const result = await uploadFile(req.file.buffer);
 
-      const result = await uploadFile(req.file.buffer)
-
-      updateData.image = result.url
+      updateData.image = result.url;
     }
 
-    const updatedImage = await Image.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true }
-    )
+    const updatedImage = await Image.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
 
     res.json({
       message: "Image updated successfully",
-      data: updatedImage
-    })
-
+      data: updatedImage,
+    });
   } catch (error) {
-
     res.status(500).json({
-      error: error.message
-    })
-
+      error: error.message,
+    });
   }
-
-}
+};
