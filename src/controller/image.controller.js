@@ -81,16 +81,25 @@ exports.updateImage = async (req, res) => {
       });
     }
 
-    let updateData = {
-      caption: req.body.caption,
-    };
+    // If neither a new image file nor a new caption was provided, throw error
+    if (!req.file && !req.body.caption) {
+      return res.status(400).json({
+        message:
+          "Please provide at least a new image or a new caption to update",
+      });
+    }
 
+    let updateData = {};
+
+    // Only update caption if provided
+    if (req.body.caption) {
+      updateData.caption = req.body.caption;
+    }
+
+    // Only update image if a new file was provided
     if (req.file) {
-      // delete old image from ImageKit
       await deleteFile(image.fileId);
-
       const result = await uploadFile(req.file.buffer);
-
       updateData.image = result.url;
       updateData.fileId = result.fileId;
     }
