@@ -9,10 +9,10 @@ router.post("/upload", upload.single("image"), imageController.uploadImage)
 
 router.get("/", imageController.getImages)
 
-router.get("/:id", imageController.getImageById)
+router.put("/update/:id", upload.single("image"), imageController.updateImage)
 
 router.delete("/:id", imageController.deleteImage)
 
-router.put("/update/:id", upload.single("image"), imageController.updateImage)
+router.get("/:id", imageController.getImageById)
 
 module.exports = router

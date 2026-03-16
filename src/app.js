@@ -6,7 +6,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// serve uploaded images
 app.use("/uploads", express.static("uploads"));
 
 const imageRouter = require("./router/image.router");

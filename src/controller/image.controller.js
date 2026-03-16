@@ -1,5 +1,5 @@
 const Image = require("../model/image.model");
-const uploadFile = require("../service/storage.service");
+const { uploadFile, deleteFile } = require("../service/storage.service");
 
 exports.uploadImage = async (req, res) => {
   try {
@@ -13,6 +13,7 @@ exports.uploadImage = async (req, res) => {
 
     const image = await Image.create({
       image: result.url,
+      fileId: result.fileId,
       caption: req.body.caption,
     });
 
@@ -28,40 +29,67 @@ exports.uploadImage = async (req, res) => {
     });
   }
 };
+
 exports.getImages = async (req, res) => {
   const images = await Image.find();
-
   res.json(images);
 };
 
 exports.getImageById = async (req, res) => {
   const image = await Image.findById(req.params.id);
-
   res.json(image);
 };
 
 exports.deleteImage = async (req, res) => {
-  await Image.findByIdAndDelete(req.params.id);
+  try {
+    const image = await Image.findById(req.params.id);
 
-  res.json({
-    message: "Image deleted",
-  });
+    if (!image) {
+      return res.status(404).json({
+        message: "Image not found",
+      });
+    }
+
+    // delete image from ImageKit
+    await deleteFile(image.fileId);
+
+    // delete from MongoDB
+    await Image.findByIdAndDelete(req.params.id);
+
+    res.json({
+      message: "Image deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
 };
 
 exports.updateImage = async (req, res) => {
   try {
     const id = req.params.id;
 
+    const image = await Image.findById(id);
+
+    if (!image) {
+      return res.status(404).json({
+        message: "Image not found",
+      });
+    }
+
     let updateData = {
       caption: req.body.caption,
     };
 
     if (req.file) {
-      const uploadFile = require("../services/storage.service");
+      // delete old image from ImageKit
+      await deleteFile(image.fileId);
 
       const result = await uploadFile(req.file.buffer);
 
       updateData.image = result.url;
+      updateData.fileId = result.fileId;
     }
 
     const updatedImage = await Image.findByIdAndUpdate(id, updateData, {

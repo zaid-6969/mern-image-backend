@@ -12,7 +12,17 @@ async function uploadFile(buffer) {
     fileName: "image.jpg",
   });
 
-  return result;
+  return {
+    url: result.url,
+    fileId: result.fileId,
+  };
 }
 
-module.exports = uploadFile;
+async function deleteFile(fileId) {
+  await imagekit.deleteFile(fileId);
+}
+
+module.exports = {
+  uploadFile,
+  deleteFile,
+};
