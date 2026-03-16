@@ -50,17 +50,20 @@ exports.deleteImage = async (req, res) => {
       });
     }
 
-    // delete image from ImageKit
+    console.log("Deleting ImageKit file:", image.fileId);
+
     await deleteFile(image.fileId);
 
-    // delete from MongoDB
     await Image.findByIdAndDelete(req.params.id);
 
     res.json({
       message: "Image deleted successfully",
     });
   } catch (error) {
+    console.error("DELETE ERROR:", error);
+
     res.status(500).json({
+      message: "Server error",
       error: error.message,
     });
   }
